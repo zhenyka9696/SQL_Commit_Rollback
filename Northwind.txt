@@ -1,0 +1,1077 @@
+--Коментарии
+select count(*) product;
+select product_name,quantity_per_unit from products
+limit 10;
+select product_id, product_name from products
+where discontinued = false order by product_name
+limit 10;
+select count (*) from products;
+select count (*) from products where discontinued = false;
+select count (*) from products where discontinued = true;
+select count (*) from products where discontinued = false
+union
+select count (*) from products where discontinued = true;
+select count (*) from products where discontinued = false
+union all
+select count (*) from products where discontinued = true;
+select product_name, max(unit_price) from products;
+select product_name, min(unit_price) from products;
+select product_name, unit_price from products
+order by unit_price limit 1;
+select product_name, unit_price from products
+order by unit_price desc limit 1;
+select product_name, unit_price from products
+where discontinued=false and unit_price>=15 and unit_price<=25;
+--select product_name, unit_price from products
+--where discontinued=false and unit_price>=avg(unit_price);
+
+select avg(unit_price) from products;
+select product_name, unit_price from products
+where discontinued=false and unit_price>=(select avg(unit_price) from products);
+select product_name, category_name, company_name, contact_name from
+products inner join categories
+on products.category_id=categories.category_id
+inner join suppliers
+on products.supplier_id=suppliers.supplier_id;
+select last_name, first_name, territory_description from employees
+inner join employee_territories on employees.employee_id=employee_territories.employee_id
+inner join territories
+on territories.territory_id=employee_territories.territory_id;
+
+//22.03.2022//
+
+select territory_description, region_description from territories 
+natural join region;
+
+select company_name, contact_name, order_date, last_name first_name from customers
+natural join orders
+inner join employees on orders.employee_id= employees.employee_id
+where (order_date>"1996-01-01" and order_date<'1997-01-01');
+
+select * from shippers;
+select ship_via from orders limit 20;
+
+select product_name, company_name, order_date from shippers
+inner join orders on orders.ship_via = shippers.shipper_id
+inner join order_details on orders.order_id = order_details.order_id
+inner join products on order_details.product_id = products.product_id
+where LOWER (company_name)= 'united package';
+
+select category_name, product_name, unit_price
+from products inner join categories on 
+products.category_id=categories.category_id;
+
+create view cat_prod as select category_name, product_name, unit_price
+from products inner join categories on 
+products.category_id=categories.category_id;
+
+SELECT * FROM sqlite_master WHERE type = 'view';
+
+//25.03.2022//
+
+create view if not exists cat_prod as
+select category_name, product_name, unit_price from categories
+inner join products on categories.category_id=products.category_id;
+ select category_name, count(*) from cat_prod group by category_name;
+
+create view if not exists reg_ter as
+ select territory_description, region_description from territories
+ inner join region on region.region_id=territories.region_id;
+
+//грязный код//
+
+SQLite version 3.38.1 2022-03-12 13:37:29
+Enter ".help" for usage hints.
+Connected to a transient in-memory database.
+Use ".open FILENAME" to reopen on a persistent database.
+sqlite> .open northwind
+sqlite> select * from cat_prod;
+Parse error: no such table: cat_prod
+sqlite> create view if not exists cat_prod as
+   ...> select category_name, product_name, unit_price from categories
+   ...> inner join products on categories.category_id=products.category_id;
+sqlite>
+sqlite> select * from cat_prod;
+Parse error: no such table: main.categories
+sqlite> select * from cat_prod limit 10;
+Parse error: no such table: main.categories
+sqlite> .tables
+cat_prod
+sqlite> .open northwind.db
+sqlite> select * from cat_prod limit 10;
+Beverages|Chai|18.0
+Beverages|Chang|19.0
+Condiments|Aniseed Syrup|10.0
+Condiments|Chef Anton's Cajun Seasoning|22.0
+Condiments|Chef Anton's Gumbo Mix|21.3500004
+Condiments|Grandma's Boysenberry Spread|25.0
+Produce|Uncle Bob's Organic Dried Pears|30.0
+Condiments|Northwoods Cranberry Sauce|40.0
+Meat/Poultry|Mishi Kobe Niku|97.0
+Seafood|Ikura|31.0
+sqlite> .mode box
+sqlite> select * from cat_prod limit 10;
+┌───────────────┬─────────────────────────────────┬────────────┐
+│ category_name │          product_name           │ unit_price │
+├───────────────┼─────────────────────────────────┼────────────┤
+│ Beverages     │ Chai                            │ 18.0       │
+│ Beverages     │ Chang                           │ 19.0       │
+│ Condiments    │ Aniseed Syrup                   │ 10.0       │
+│ Condiments    │ Chef Anton's Cajun Seasoning    │ 22.0       │
+│ Condiments    │ Chef Anton's Gumbo Mix          │ 21.3500004 │
+│ Condiments    │ Grandma's Boysenberry Spread    │ 25.0       │
+│ Produce       │ Uncle Bob's Organic Dried Pears │ 30.0       │
+│ Condiments    │ Northwoods Cranberry Sauce      │ 40.0       │
+│ Meat/Poultry  │ Mishi Kobe Niku                 │ 97.0       │
+│ Seafood       │ Ikura                           │ 31.0       │
+└───────────────┴─────────────────────────────────┴────────────┘
+sqlite> .tables
+cat_prod                employee_territories    region
+categories              employees               shippers
+customer_customer_demo  order_details           suppliers
+customer_demographics   orders                  territories
+customers               products                us_states
+sqlite> select category_name from
+   ...> cat_prod
+   ...> wgey3hh;
+┌────────────────┐
+│ category_name  │
+├────────────────┤
+│ Beverages      │
+│ Beverages      │
+│ Condiments     │
+│ Condiments     │
+│ Condiments     │
+│ Condiments     │
+│ Produce        │
+│ Condiments     │
+│ Meat/Poultry   │
+│ Seafood        │
+│ Dairy Products │
+│ Dairy Products │
+│ Seafood        │
+│ Produce        │
+│ Condiments     │
+│ Confections    │
+│ Meat/Poultry   │
+│ Seafood        │
+│ Confections    │
+│ Confections    │
+│ Confections    │
+│ Grains/Cereals │
+│ Grains/Cereals │
+│ Beverages      │
+│ Confections    │
+│ Confections    │
+│ Confections    │
+│ Produce        │
+│ Meat/Poultry   │
+│ Seafood        │
+│ Dairy Products │
+│ Dairy Products │
+│ Dairy Products │
+│ Beverages      │
+│ Beverages      │
+│ Seafood        │
+│ Seafood        │
+│ Beverages      │
+│ Beverages      │
+│ Seafood        │
+│ Seafood        │
+│ Grains/Cereals │
+│ Beverages      │
+│ Condiments     │
+│ Seafood        │
+│ Seafood        │
+│ Confections    │
+│ Confections    │
+│ Confections    │
+│ Confections    │
+│ Produce        │
+│ Grains/Cereals │
+│ Meat/Poultry   │
+│ Meat/Poultry   │
+│ Meat/Poultry   │
+│ Grains/Cereals │
+│ Grains/Cereals │
+│ Seafood        │
+│ Dairy Products │
+│ Dairy Products │
+│ Condiments     │
+│ Confections    │
+│ Condiments     │
+│ Grains/Cereals │
+│ Condiments     │
+│ Condiments     │
+│ Beverages      │
+│ Confections    │
+│ Dairy Products │
+│ Beverages      │
+│ Dairy Products │
+│ Dairy Products │
+│ Seafood        │
+│ Produce        │
+│ Beverages      │
+│ Beverages      │
+│ Condiments     │
+└────────────────┘
+sqlite> select category_name, count(*) from cat_prod group by category_name;
+┌────────────────┬──────────┐
+│ category_name  │ count(*) │
+├────────────────┼──────────┤
+│ Beverages      │ 12       │
+│ Condiments     │ 12       │
+│ Confections    │ 13       │
+│ Dairy Products │ 10       │
+│ Grains/Cereals │ 7        │
+│ Meat/Poultry   │ 6        │
+│ Produce        │ 5        │
+│ Seafood        │ 12       │
+└────────────────┴──────────┘
+sqlite> select category_name, count(*) from cat_prod group by category_name union all select '___',
+   ...> '_________'
+   ...> union all select 'Total' , count(*) from cat_prod;
+┌────────────────┬───────────┐
+│ category_name  │ count(*)  │
+├────────────────┼───────────┤
+│ Beverages      │ 12        │
+│ Condiments     │ 12        │
+│ Confections    │ 13        │
+│ Dairy Products │ 10        │
+│ Grains/Cereals │ 7         │
+│ Meat/Poultry   │ 6         │
+│ Produce        │ 5         │
+│ Seafood        │ 12        │
+│ ___            │ _________ │
+│ Total          │ 77        │
+└────────────────┴───────────┘
+sqlite> .tables
+cat_prod                employee_territories    region
+categories              employees               shippers
+customer_customer_demo  order_details           suppliers
+customer_demographics   orders                  territories
+customers               products                us_states
+sqlite> .schema region
+CREATE TABLE region (
+    region_id smallint NOT NULL PRIMARY KEY,
+    region_description bpchar NOT NULL
+);
+sqlite> create view reg_ter if not exists as select territory_description, region_description
+   ...> from territories
+   ...> serggt;
+Parse error: near "if": syntax error
+  create view reg_ter if not exists as select territory_description, region_desc
+                      ^--- error here
+sqlite> create view if not exists reg_ter as
+   ...>  select territory_description, region_description from territories
+   ...>  inner join region on region.region_id=territories.region_id;
+sqlite> select * from territories;
+┌──────────────┬───────────────────────┬───────────┐
+│ territory_id │ territory_description │ region_id │
+├──────────────┼───────────────────────┼───────────┤
+│ 01581        │ Westboro              │ 1         │
+│ 01730        │ Bedford               │ 1         │
+│ 01833        │ Georgetow             │ 1         │
+│ 02116        │ Boston                │ 1         │
+│ 02139        │ Cambridge             │ 1         │
+│ 02184        │ Braintree             │ 1         │
+│ 02903        │ Providence            │ 1         │
+│ 03049        │ Hollis                │ 3         │
+│ 03801        │ Portsmouth            │ 3         │
+│ 06897        │ Wilton                │ 1         │
+│ 07960        │ Morristown            │ 1         │
+│ 08837        │ Edison                │ 1         │
+│ 10019        │ New York              │ 1         │
+│ 10038        │ New York              │ 1         │
+│ 11747        │ Mellvile              │ 1         │
+│ 14450        │ Fairport              │ 1         │
+│ 19428        │ Philadelphia          │ 3         │
+│ 19713        │ Neward                │ 1         │
+│ 20852        │ Rockville             │ 1         │
+│ 27403        │ Greensboro            │ 1         │
+│ 27511        │ Cary                  │ 1         │
+│ 29202        │ Columbia              │ 4         │
+│ 30346        │ Atlanta               │ 4         │
+│ 31406        │ Savannah              │ 4         │
+│ 32859        │ Orlando               │ 4         │
+│ 33607        │ Tampa                 │ 4         │
+│ 40222        │ Louisville            │ 1         │
+│ 44122        │ Beachwood             │ 3         │
+│ 45839        │ Findlay               │ 3         │
+│ 48075        │ Southfield            │ 3         │
+│ 48084        │ Troy                  │ 3         │
+│ 48304        │ Bloomfield Hills      │ 3         │
+│ 53404        │ Racine                │ 3         │
+│ 55113        │ Roseville             │ 3         │
+│ 55439        │ Minneapolis           │ 3         │
+│ 60179        │ Hoffman Estates       │ 2         │
+│ 60601        │ Chicago               │ 2         │
+│ 72716        │ Bentonville           │ 4         │
+│ 75234        │ Dallas                │ 4         │
+│ 78759        │ Austin                │ 4         │
+│ 80202        │ Denver                │ 2         │
+│ 80909        │ Colorado Springs      │ 2         │
+│ 85014        │ Phoenix               │ 2         │
+│ 85251        │ Scottsdale            │ 2         │
+│ 90405        │ Santa Monica          │ 2         │
+│ 94025        │ Menlo Park            │ 2         │
+│ 94105        │ San Francisco         │ 2         │
+│ 95008        │ Campbell              │ 2         │
+│ 95054        │ Santa Clara           │ 2         │
+│ 95060        │ Santa Cruz            │ 2         │
+│ 98004        │ Bellevue              │ 2         │
+│ 98052        │ Redmond               │ 2         │
+│ 98104        │ Seattle               │ 2         │
+└──────────────┴───────────────────────┴───────────┘
+sqlite> insert into territories( territory_id, territory_description, region_id) values(98105, 'ter1'
+   ...> ,1);
+sqlite> select * from territories;
+┌──────────────┬───────────────────────┬───────────┐
+│ territory_id │ territory_description │ region_id │
+├──────────────┼───────────────────────┼───────────┤
+│ 01581        │ Westboro              │ 1         │
+│ 01730        │ Bedford               │ 1         │
+│ 01833        │ Georgetow             │ 1         │
+│ 02116        │ Boston                │ 1         │
+│ 02139        │ Cambridge             │ 1         │
+│ 02184        │ Braintree             │ 1         │
+│ 02903        │ Providence            │ 1         │
+│ 03049        │ Hollis                │ 3         │
+│ 03801        │ Portsmouth            │ 3         │
+│ 06897        │ Wilton                │ 1         │
+│ 07960        │ Morristown            │ 1         │
+│ 08837        │ Edison                │ 1         │
+│ 10019        │ New York              │ 1         │
+│ 10038        │ New York              │ 1         │
+│ 11747        │ Mellvile              │ 1         │
+│ 14450        │ Fairport              │ 1         │
+│ 19428        │ Philadelphia          │ 3         │
+│ 19713        │ Neward                │ 1         │
+│ 20852        │ Rockville             │ 1         │
+│ 27403        │ Greensboro            │ 1         │
+│ 27511        │ Cary                  │ 1         │
+│ 29202        │ Columbia              │ 4         │
+│ 30346        │ Atlanta               │ 4         │
+│ 31406        │ Savannah              │ 4         │
+│ 32859        │ Orlando               │ 4         │
+│ 33607        │ Tampa                 │ 4         │
+│ 40222        │ Louisville            │ 1         │
+│ 44122        │ Beachwood             │ 3         │
+│ 45839        │ Findlay               │ 3         │
+│ 48075        │ Southfield            │ 3         │
+│ 48084        │ Troy                  │ 3         │
+│ 48304        │ Bloomfield Hills      │ 3         │
+│ 53404        │ Racine                │ 3         │
+│ 55113        │ Roseville             │ 3         │
+│ 55439        │ Minneapolis           │ 3         │
+│ 60179        │ Hoffman Estates       │ 2         │
+│ 60601        │ Chicago               │ 2         │
+│ 72716        │ Bentonville           │ 4         │
+│ 75234        │ Dallas                │ 4         │
+│ 78759        │ Austin                │ 4         │
+│ 80202        │ Denver                │ 2         │
+│ 80909        │ Colorado Springs      │ 2         │
+│ 85014        │ Phoenix               │ 2         │
+│ 85251        │ Scottsdale            │ 2         │
+│ 90405        │ Santa Monica          │ 2         │
+│ 94025        │ Menlo Park            │ 2         │
+│ 94105        │ San Francisco         │ 2         │
+│ 95008        │ Campbell              │ 2         │
+│ 95054        │ Santa Clara           │ 2         │
+│ 95060        │ Santa Cruz            │ 2         │
+│ 98004        │ Bellevue              │ 2         │
+│ 98052        │ Redmond               │ 2         │
+│ 98104        │ Seattle               │ 2         │
+│ 98105        │ ter1                  │ 1         │
+└──────────────┴───────────────────────┴───────────┘
+sqlite> insert into territories( territory_id, territory_description, region_id) values(98105, 'ter2',
+   ...> ,5);
+Parse error: near ",": syntax error
+  ory_description, region_id) values(98105, 'ter2', ,5);
+                                      error here ---^
+sqlite> insert into territories( territory_id, territory_description, region_id) values(98105, 'ter2',
+   ...> 5);
+Runtime error: UNIQUE constraint failed: territories.territory_id (19)
+sqlite> select * from reg_ter;
+┌───────────────────────┬────────────────────┐
+│ territory_description │ region_description │
+├───────────────────────┼────────────────────┤
+│ Westboro              │ Eastern            │
+│ Bedford               │ Eastern            │
+│ Georgetow             │ Eastern            │
+│ Boston                │ Eastern            │
+│ Cambridge             │ Eastern            │
+│ Braintree             │ Eastern            │
+│ Providence            │ Eastern            │
+│ Hollis                │ Northern           │
+│ Portsmouth            │ Northern           │
+│ Wilton                │ Eastern            │
+│ Morristown            │ Eastern            │
+│ Edison                │ Eastern            │
+│ New York              │ Eastern            │
+│ New York              │ Eastern            │
+│ Mellvile              │ Eastern            │
+│ Fairport              │ Eastern            │
+│ Philadelphia          │ Northern           │
+│ Neward                │ Eastern            │
+│ Rockville             │ Eastern            │
+│ Greensboro            │ Eastern            │
+│ Cary                  │ Eastern            │
+│ Columbia              │ Southern           │
+│ Atlanta               │ Southern           │
+│ Savannah              │ Southern           │
+│ Orlando               │ Southern           │
+│ Tampa                 │ Southern           │
+│ Louisville            │ Eastern            │
+│ Beachwood             │ Northern           │
+│ Findlay               │ Northern           │
+│ Southfield            │ Northern           │
+│ Troy                  │ Northern           │
+│ Bloomfield Hills      │ Northern           │
+│ Racine                │ Northern           │
+│ Roseville             │ Northern           │
+│ Minneapolis           │ Northern           │
+│ Hoffman Estates       │ Western            │
+│ Chicago               │ Western            │
+│ Bentonville           │ Southern           │
+│ Dallas                │ Southern           │
+│ Austin                │ Southern           │
+│ Denver                │ Western            │
+│ Colorado Springs      │ Western            │
+│ Phoenix               │ Western            │
+│ Scottsdale            │ Western            │
+│ Santa Monica          │ Western            │
+│ Menlo Park            │ Western            │
+│ San Francisco         │ Western            │
+│ Campbell              │ Western            │
+│ Santa Clara           │ Western            │
+│ Santa Cruz            │ Western            │
+│ Bellevue              │ Western            │
+│ Redmond               │ Western            │
+│ Seattle               │ Western            │
+│ ter1                  │ Eastern            │
+└───────────────────────┴────────────────────┘
+sqlite> select * from reg_ter2;
+Parse error: no such table: reg_ter2
+sqlite> create temporary table ranks(name varchar(2));
+sqlite> insert into ranks (name) valluese('6'),('7'),('8'),('9'),('10'),('В'),('Д'),('К'),('Т');
+Parse error: near "valluese": syntax error
+  insert into ranks (name) valluese('6'),('7'),('8'),('9'),('10'),('В'),('Д'),
+             error here ---^
+sqlite> insert into ranks (name) valluese('6'),('7'),('8'),('9'),('10'),('В'),('Д'),('К'),('Т');
+Parse error: near "valluese": syntax error
+  insert into ranks (name) valluese('6'),('7'),('8'),('9'),('10'),('В'),('Д'),
+             error here ---^
+sqlite> insert into ranks (name) vallues('6'),('7'),('8'),('9'),('10'),('В'),('Д'),('К'),('Т');
+Parse error: near "vallues": syntax error
+  insert into ranks (name) vallues('6'),('7'),('8'),('9'),('10'),('В'),('Д'),(
+             error here ---^
+sqlite> insert into ranks (name) values('6'),('7'),('8'),('9'),('10'),('В'),('Д'),('К'),('Т');
+sqlite> select * from ranks;
+┌──────┐
+│ name │
+├──────┤
+│ 6    │
+│ 7    │
+│ 8    │
+│ 9    │
+│ 10   │
+│ В    │
+│ Д    │
+│ К    │
+│ Т    │
+└──────┘
+sqlite> create temporary table suits(name varchar(10));
+sqlite> INSERT INTO suits(name) VALUES ('пики'),('червы'),('бубны'),('трефы');
+sqlite> select * from suits;
+┌───────┐
+│ name  │
+├───────┤
+│ пики  │
+│ червы │
+│ бубны │
+│ трефы │
+└───────┘
+sqlite> create temporary table cards as select * from ranks cross join suits;
+sqlite> select * from cards;
+┌──────┬────────┐
+│ name │ name:1 │
+├──────┼────────┤
+│ 6    │ пики   │
+│ 6    │ червы  │
+│ 6    │ бубны  │
+│ 6    │ трефы  │
+│ 7    │ пики   │
+│ 7    │ червы  │
+│ 7    │ бубны  │
+│ 7    │ трефы  │
+│ 8    │ пики   │
+│ 8    │ червы  │
+│ 8    │ бубны  │
+│ 8    │ трефы  │
+│ 9    │ пики   │
+│ 9    │ червы  │
+│ 9    │ бубны  │
+│ 9    │ трефы  │
+│ 10   │ пики   │
+│ 10   │ червы  │
+│ 10   │ бубны  │
+│ 10   │ трефы  │
+│ В    │ пики   │
+│ В    │ червы  │
+│ В    │ бубны  │
+│ В    │ трефы  │
+│ Д    │ пики   │
+│ Д    │ червы  │
+│ Д    │ бубны  │
+│ Д    │ трефы  │
+│ К    │ пики   │
+│ К    │ червы  │
+│ К    │ бубны  │
+│ К    │ трефы  │
+│ Т    │ пики   │
+│ Т    │ червы  │
+│ Т    │ бубны  │
+│ Т    │ трефы  │
+└──────┴────────┘
+sqlite> select count(*) from cards;
+┌──────────┐
+│ count(*) │
+├──────────┤
+│ 36       │
+└──────────┘
+sqlite> create temporary table t1(v1 int);
+sqlite> insert into t1(v1) values(1),(2),(3);
+sqlite> creat temporary table t2(v2 int);
+Parse error: near "creat": syntax error
+  creat temporary table t2(v2 int);
+  ^--- error here
+sqlite> create temporary table t2(v2 int);
+sqlite> INSERT INTO t2(v2) VALUES(2),(3),(4);
+sqlite>
+sqlite> select * from t1 union all select * from t2;
+┌────┐
+│ v1 │
+├────┤
+│ 1  │
+│ 2  │
+│ 3  │
+│ 2  │
+│ 3  │
+│ 4  │
+└────┘
+sqlite> select * from t1 intersect select *from t2;
+┌────┐
+│ v1 │
+├────┤
+│ 2  │
+│ 3  │
+└────┘
+sqlite> select * from t1 except select *from t2;
+┌────┐
+│ v1 │
+├────┤
+│ 1  │
+└────┘
+sqlite> select * from t2 except select *from t1;
+┌────┐
+│ v2 │
+├────┤
+│ 4  │
+└────┘
+sqlite> select v1 from t1 inner inner join t2 on v1=v2;
+┌────┐
+│ v1 │
+├────┤
+│ 2  │
+│ 3  │
+└────┘
+sqlite> select v1 from t1 left join t2 on v1=v2;
+┌────┐
+│ v1 │
+├────┤
+│ 1  │
+│ 2  │
+│ 3  │
+└────┘
+sqlite> create table new_territories(id integer_primary key autoincrement, name text not null);
+Parse error: near "autoincrement": syntax error
+  eate table new_territories(id integer_primary key autoincrement, name text not
+                                      error here ---^
+sqlite> create table new_territories(id integer bprimary key autoincrement, name text not null);
+Parse error: near "autoincrement": syntax error
+  ate table new_territories(id integer bprimary key autoincrement, name text not
+                                      error here ---^
+sqlite> create table new_territories(id integer primary key autoincrement, name text not null);
+sqlite> drop trigger if exists insert_territory;
+sqlite> create trigger insert_territory after insert on territories begin insert into
+   ...> new_territories(name) values(new.territory_description); end;
+sqlite> select * from territories;
+┌──────────────┬───────────────────────┬───────────┐
+│ territory_id │ territory_description │ region_id │
+├──────────────┼───────────────────────┼───────────┤
+│ 01581        │ Westboro              │ 1         │
+│ 01730        │ Bedford               │ 1         │
+│ 01833        │ Georgetow             │ 1         │
+│ 02116        │ Boston                │ 1         │
+│ 02139        │ Cambridge             │ 1         │
+│ 02184        │ Braintree             │ 1         │
+│ 02903        │ Providence            │ 1         │
+│ 03049        │ Hollis                │ 3         │
+│ 03801        │ Portsmouth            │ 3         │
+│ 06897        │ Wilton                │ 1         │
+│ 07960        │ Morristown            │ 1         │
+│ 08837        │ Edison                │ 1         │
+│ 10019        │ New York              │ 1         │
+│ 10038        │ New York              │ 1         │
+│ 11747        │ Mellvile              │ 1         │
+│ 14450        │ Fairport              │ 1         │
+│ 19428        │ Philadelphia          │ 3         │
+│ 19713        │ Neward                │ 1         │
+│ 20852        │ Rockville             │ 1         │
+│ 27403        │ Greensboro            │ 1         │
+│ 27511        │ Cary                  │ 1         │
+│ 29202        │ Columbia              │ 4         │
+│ 30346        │ Atlanta               │ 4         │
+│ 31406        │ Savannah              │ 4         │
+│ 32859        │ Orlando               │ 4         │
+│ 33607        │ Tampa                 │ 4         │
+│ 40222        │ Louisville            │ 1         │
+│ 44122        │ Beachwood             │ 3         │
+│ 45839        │ Findlay               │ 3         │
+│ 48075        │ Southfield            │ 3         │
+│ 48084        │ Troy                  │ 3         │
+│ 48304        │ Bloomfield Hills      │ 3         │
+│ 53404        │ Racine                │ 3         │
+│ 55113        │ Roseville             │ 3         │
+│ 55439        │ Minneapolis           │ 3         │
+│ 60179        │ Hoffman Estates       │ 2         │
+│ 60601        │ Chicago               │ 2         │
+│ 72716        │ Bentonville           │ 4         │
+│ 75234        │ Dallas                │ 4         │
+│ 78759        │ Austin                │ 4         │
+│ 80202        │ Denver                │ 2         │
+│ 80909        │ Colorado Springs      │ 2         │
+│ 85014        │ Phoenix               │ 2         │
+│ 85251        │ Scottsdale            │ 2         │
+│ 90405        │ Santa Monica          │ 2         │
+│ 94025        │ Menlo Park            │ 2         │
+│ 94105        │ San Francisco         │ 2         │
+│ 95008        │ Campbell              │ 2         │
+│ 95054        │ Santa Clara           │ 2         │
+│ 95060        │ Santa Cruz            │ 2         │
+│ 98004        │ Bellevue              │ 2         │
+│ 98052        │ Redmond               │ 2         │
+│ 98104        │ Seattle               │ 2         │
+│ 98105        │ ter1                  │ 1         │
+└──────────────┴───────────────────────┴───────────┘
+sqlite> insert into territories(territories_id, territory_description,region_id) values (98107,
+   ...> 'new ter 1',1)
+   ...> ;
+Parse error: table territories has no column named territories_id
+sqlite> insert into territories(territory_id, territory_description,region_id) values (98107,
+   ...> 'new ter 1',1)
+   ...> ;
+sqlite> select * from new_territories;
+┌────┬───────────┐
+│ id │   name    │
+├────┼───────────┤
+│ 1  │ new ter 1 │
+└────┴───────────┘
+sqlite> select * from territories;
+┌──────────────┬───────────────────────┬───────────┐
+│ territory_id │ territory_description │ region_id │
+├──────────────┼───────────────────────┼───────────┤
+│ 01581        │ Westboro              │ 1         │
+│ 01730        │ Bedford               │ 1         │
+│ 01833        │ Georgetow             │ 1         │
+│ 02116        │ Boston                │ 1         │
+│ 02139        │ Cambridge             │ 1         │
+│ 02184        │ Braintree             │ 1         │
+│ 02903        │ Providence            │ 1         │
+│ 03049        │ Hollis                │ 3         │
+│ 03801        │ Portsmouth            │ 3         │
+│ 06897        │ Wilton                │ 1         │
+│ 07960        │ Morristown            │ 1         │
+│ 08837        │ Edison                │ 1         │
+│ 10019        │ New York              │ 1         │
+│ 10038        │ New York              │ 1         │
+│ 11747        │ Mellvile              │ 1         │
+│ 14450        │ Fairport              │ 1         │
+│ 19428        │ Philadelphia          │ 3         │
+│ 19713        │ Neward                │ 1         │
+│ 20852        │ Rockville             │ 1         │
+│ 27403        │ Greensboro            │ 1         │
+│ 27511        │ Cary                  │ 1         │
+│ 29202        │ Columbia              │ 4         │
+│ 30346        │ Atlanta               │ 4         │
+│ 31406        │ Savannah              │ 4         │
+│ 32859        │ Orlando               │ 4         │
+│ 33607        │ Tampa                 │ 4         │
+│ 40222        │ Louisville            │ 1         │
+│ 44122        │ Beachwood             │ 3         │
+│ 45839        │ Findlay               │ 3         │
+│ 48075        │ Southfield            │ 3         │
+│ 48084        │ Troy                  │ 3         │
+│ 48304        │ Bloomfield Hills      │ 3         │
+│ 53404        │ Racine                │ 3         │
+│ 55113        │ Roseville             │ 3         │
+│ 55439        │ Minneapolis           │ 3         │
+│ 60179        │ Hoffman Estates       │ 2         │
+│ 60601        │ Chicago               │ 2         │
+│ 72716        │ Bentonville           │ 4         │
+│ 75234        │ Dallas                │ 4         │
+│ 78759        │ Austin                │ 4         │
+│ 80202        │ Denver                │ 2         │
+│ 80909        │ Colorado Springs      │ 2         │
+│ 85014        │ Phoenix               │ 2         │
+│ 85251        │ Scottsdale            │ 2         │
+│ 90405        │ Santa Monica          │ 2         │
+│ 94025        │ Menlo Park            │ 2         │
+│ 94105        │ San Francisco         │ 2         │
+│ 95008        │ Campbell              │ 2         │
+│ 95054        │ Santa Clara           │ 2         │
+│ 95060        │ Santa Cruz            │ 2         │
+│ 98004        │ Bellevue              │ 2         │
+│ 98052        │ Redmond               │ 2         │
+│ 98104        │ Seattle               │ 2         │
+│ 98105        │ ter1                  │ 1         │
+│ 98107        │ new ter 1             │ 1         │
+└──────────────┴───────────────────────┴───────────┘
+sqlite> create trigger insert_territory after insert on territories begin insert into new_territories
+   ...> (namewqfqfwq)q fghgkohjpjephj;
+   ...> eg)___);
+   ...> ;
+   ...> ;
+   ...> wq
+   ...> end;
+  SQLite version 3.38.1 2022-03-12 13:37:29
+Enter ".help" for usage hints.
+Connected to a transient in-memory database.
+Use ".open FILENAME" to reopen on a persistent database.
+sqlite> .open northwind.db
+sqlite> .tables
+cat_prod                employees               region
+categories              new_territories         shippers
+customer_customer_demo  order_details           suppliers
+customer_demographics   orders                  territories
+customers               products                us_states
+employee_territories    reg_ter
+sqlite> create trigger validate_territory_before_insert
+   ...> before insert on territories
+   ...> begin
+   ...> select
+   ...> case
+   ...> when new.territory_description not like '%_' then
+   ...> raise (abort,'Inavalid name territory')
+   ...> end;
+   ...> end;
+sqlite> insert into territories (territory_id, territory_description, region_id) values (98108, 'r 1', 1);
+sqlite> insert into territories (territory_id, territory_description, region_id) values (98108, 'r', 1);
+Runtime error: UNIQUE constraint failed: territories.territory_id (19)
+sqlite> insert into territories (territory_id, territory_description, region_id) values (98110, 'r', 2);
+sqlite> select * from new_territories;
+1|new ter 1
+2|r 1
+3|r
+sqlite> select * from territories;
+01581|Westboro|1
+01730|Bedford|1
+01833|Georgetow|1
+02116|Boston|1
+02139|Cambridge|1
+02184|Braintree|1
+02903|Providence|1
+03049|Hollis|3
+03801|Portsmouth|3
+06897|Wilton|1
+07960|Morristown|1
+08837|Edison|1
+10019|New York|1
+10038|New York|1
+11747|Mellvile|1
+14450|Fairport|1
+19428|Philadelphia|3
+19713|Neward|1
+20852|Rockville|1
+27403|Greensboro|1
+27511|Cary|1
+29202|Columbia|4
+30346|Atlanta|4
+31406|Savannah|4
+32859|Orlando|4
+33607|Tampa|4
+40222|Louisville|1
+44122|Beachwood|3
+45839|Findlay|3
+48075|Southfield|3
+48084|Troy|3
+48304|Bloomfield Hills|3
+53404|Racine|3
+55113|Roseville|3
+55439|Minneapolis|3
+60179|Hoffman Estates|2
+60601|Chicago|2
+72716|Bentonville|4
+75234|Dallas|4
+78759|Austin|4
+80202|Denver|2
+80909|Colorado Springs|2
+85014|Phoenix|2
+85251|Scottsdale|2
+90405|Santa Monica|2
+94025|Menlo Park|2
+94105|San Francisco|2
+95008|Campbell|2
+95054|Santa Clara|2
+95060|Santa Cruz|2
+98004|Bellevue|2
+98052|Redmond|2
+98104|Seattle|2
+98105|ter1|1
+98107|new ter 1|1
+98108|r 1|1
+98110|r|2
+sqlite> .mode box
+sqlite> select * from territories;
+┌──────────────┬───────────────────────┬───────────┐
+│ territory_id │ territory_description │ region_id │
+├──────────────┼───────────────────────┼───────────┤
+│ 01581        │ Westboro              │ 1         │
+│ 01730        │ Bedford               │ 1         │
+│ 01833        │ Georgetow             │ 1         │
+│ 02116        │ Boston                │ 1         │
+│ 02139        │ Cambridge             │ 1         │
+│ 02184        │ Braintree             │ 1         │
+│ 02903        │ Providence            │ 1         │
+│ 03049        │ Hollis                │ 3         │
+│ 03801        │ Portsmouth            │ 3         │
+│ 06897        │ Wilton                │ 1         │
+│ 07960        │ Morristown            │ 1         │
+│ 08837        │ Edison                │ 1         │
+│ 10019        │ New York              │ 1         │
+│ 10038        │ New York              │ 1         │
+│ 11747        │ Mellvile              │ 1         │
+│ 14450        │ Fairport              │ 1         │
+│ 19428        │ Philadelphia          │ 3         │
+│ 19713        │ Neward                │ 1         │
+│ 20852        │ Rockville             │ 1         │
+│ 27403        │ Greensboro            │ 1         │
+│ 27511        │ Cary                  │ 1         │
+│ 29202        │ Columbia              │ 4         │
+│ 30346        │ Atlanta               │ 4         │
+│ 31406        │ Savannah              │ 4         │
+│ 32859        │ Orlando               │ 4         │
+│ 33607        │ Tampa                 │ 4         │
+│ 40222        │ Louisville            │ 1         │
+│ 44122        │ Beachwood             │ 3         │
+│ 45839        │ Findlay               │ 3         │
+│ 48075        │ Southfield            │ 3         │
+│ 48084        │ Troy                  │ 3         │
+│ 48304        │ Bloomfield Hills      │ 3         │
+│ 53404        │ Racine                │ 3         │
+│ 55113        │ Roseville             │ 3         │
+│ 55439        │ Minneapolis           │ 3         │
+│ 60179        │ Hoffman Estates       │ 2         │
+│ 60601        │ Chicago               │ 2         │
+│ 72716        │ Bentonville           │ 4         │
+│ 75234        │ Dallas                │ 4         │
+│ 78759        │ Austin                │ 4         │
+│ 80202        │ Denver                │ 2         │
+│ 80909        │ Colorado Springs      │ 2         │
+│ 85014        │ Phoenix               │ 2         │
+│ 85251        │ Scottsdale            │ 2         │
+│ 90405        │ Santa Monica          │ 2         │
+│ 94025        │ Menlo Park            │ 2         │
+│ 94105        │ San Francisco         │ 2         │
+│ 95008        │ Campbell              │ 2         │
+│ 95054        │ Santa Clara           │ 2         │
+│ 95060        │ Santa Cruz            │ 2         │
+│ 98004        │ Bellevue              │ 2         │
+│ 98052        │ Redmond               │ 2         │
+│ 98104        │ Seattle               │ 2         │
+│ 98105        │ ter1                  │ 1         │
+│ 98107        │ new ter 1             │ 1         │
+│ 98108        │ r 1                   │ 1         │
+│ 98110        │ r                     │ 2         │
+└──────────────┴───────────────────────┴───────────┘
+sqlite> drop trigger if exists insert_territory;
+sqlite>
+sqlite> CREATE TRIGGER insert_territory after insert ON territories
+   ...> BEGIN
+   ...>     insert into new_territories(name) values(new.territory_description);
+   ...> END;
+sqlite> insert into territories (territory_id, territory_description, region_id) values (98111, 'a', 2);
+sqlite> drop trigger if exists validate_territory_before_insert;
+sqlite> CREATE TRIGGER validate_territory_before_insert
+   ...>    BEFORE INSERT ON territories
+   ...> BEGIN
+   ...>    SELECT
+   ...>       CASE
+   ...> WHEN NEW.territory_description NOT LIKE '%__' THEN
+   ...>      RAISE (ABORT,'Invalid name of territory')
+   ...>        END;
+   ...> END;
+sqlite> insert into territories (territory_id, territory_description, region_id) values (98116, 'b', 2);
+Runtime error: Invalid name of territory (19)
+sqlite> drop index if exists ind_territory;
+sqlite> create index ind_territory on territories (territory_description);
+sqlite> select * from territories where territory_description like 'Redmond';
+┌──────────────┬───────────────────────┬───────────┐
+│ territory_id │ territory_description │ region_id │
+├──────────────┼───────────────────────┼───────────┤
+│ 98052        │ Redmond               │ 2         │
+└──────────────┴───────────────────────┴───────────┘
+sqlite> select * from territories where territory_description like 'R%';
+┌──────────────┬───────────────────────┬───────────┐
+│ territory_id │ territory_description │ region_id │
+├──────────────┼───────────────────────┼───────────┤
+│ 20852        │ Rockville             │ 1         │
+│ 53404        │ Racine                │ 3         │
+│ 55113        │ Roseville             │ 3         │
+│ 98052        │ Redmond               │ 2         │
+│ 98108        │ r 1                   │ 1         │
+│ 98110        │ r                     │ 2         │
+└──────────────┴───────────────────────┴───────────┘
+sqlite> pragma index_list(territories);
+┌─────┬────────────────────────────────┬────────┬────────┬─────────┐
+│ seq │              name              │ unique │ origin │ partial │
+├─────┼────────────────────────────────┼────────┼────────┼─────────┤
+│ 0   │ ind_territory                  │ 0      │ c      │ 0       │
+│ 1   │ sqlite_autoindex_territories_1 │ 1      │ pk     │ 0       │
+└─────┴────────────────────────────────┴────────┴────────┴─────────┘
+sqlite> explain query plan
+   ...> select terri;
+Parse error: no such column: terri
+  explain query plan select terri;
+              error here ---^
+sqlite> drop table if exist accounts;
+Parse error: near "exist": syntax error
+  drop table if exist accounts;
+                ^--- error here
+sqlite> drop table if exists accounts;
+sqlite> drop table if exists account_changes;
+sqlite> create table accounts(
+   ...> account-no integer not null,
+   ...> balance decimal not null default 0,
+   ...> PRIMARY KEY(account_no),
+   ...>         CHECK(balance >= 0)
+   ...> );
+Parse error: near "-": syntax error
+  create table accounts( account-no integer not null, balance decimal not null d
+                  error here ---^
+sqlite> CREATE TABLE accounts (
+   ...> account_no INTEGER NOT NULL,
+   ...> balance DECIMAL NOT NULL DEFAULT 0,
+   ...> PRIMARY KEY(account_no),
+   ...>         CHECK(balance >= 0)
+   ...> );
+sqlite> CREATE TABLE account_changes (
+   ...> change_no integer PRIMARY KEY autoincrement,
+   ...> account_no INTEGER NOT NULL,
+   ...> flag TEXT NOT NULL,
+   ...> amount DECIMAL NOT NULL,
+   ...> changed_at TEXT NOT NULL
+   ...> );
+sqlite> INSERT INTO accounts (account_no,balance) VALUES (100,2000);
+sqlite> INSERT INTO accounts (account_no,balance) VALUES (200,1000);
+sqlite> begin transaction;
+sqlite> update accounts SET balance = balance - 100 where account_no = 100;
+sqlite> update accounts SET balance = balance + 100 where account_no = 200;
+sqlite> insert into account_changes(account_no, flag, amount, changed_at)
+   ...> values(100, '-' , 100,datatime('now'));
+Parse error: no such function: datatime
+  , flag, amount, changed_at) values(100, '-' , 100,datatime('now'));
+                                      error here ---^
+sqlite> values(100, '-' , 100,datetime('now'));
+┌─────────┬─────────┬─────────┬─────────────────────┐
+│ column1 │ column2 │ column3 │       column4       │
+├─────────┼─────────┼─────────┼─────────────────────┤
+│ 100     │ -       │ 100     │ 2022-03-25 17:34:09 │
+└─────────┴─────────┴─────────┴─────────────────────┘
+sqlite> insert into account_changes (account_no, flag, amount, changed_at)
+   ...> values(200, '+', 100, datetime('now'));
+sqlite> select * from account_changes;
+┌───────────┬────────────┬──────┬────────┬─────────────────────┐
+│ change_no │ account_no │ flag │ amount │     changed_at      │
+├───────────┼────────────┼──────┼────────┼─────────────────────┤
+│ 1         │ 200        │ +    │ 100    │ 2022-03-25 17:35:33 │
+└───────────┴────────────┴──────┴────────┴─────────────────────┘
+sqlite> commit;
+sqlite> update accounts
+   ...> set balance = balance - 20000
+   ...> where account_no - 100;
+Runtime error: CHECK constraint failed: balance >= 0 (19)
+sqlite> BEGIN TRANSACTION;
+sqlite> UPDATE accounts
+   ...>    SET balance = balance - 20000
+   ...>  WHERE account_no = 100;
+Runtime error: CHECK constraint failed: balance >= 0 (19)
+sqlite> INSERT INTO account_changes(account_no,flag,amount,changed_at)
+   ...> VALUES(100,'-',20000,datetime('now'));
+sqlite>
+sqlite> SELECT * FROM account_changes;
+┌───────────┬────────────┬──────┬────────┬─────────────────────┐
+│ change_no │ account_no │ flag │ amount │     changed_at      │
+├───────────┼────────────┼──────┼────────┼─────────────────────┤
+│ 1         │ 200        │ +    │ 100    │ 2022-03-25 17:35:33 │
+│ 2         │ 100        │ -    │ 20000  │ 2022-03-25 17:41:29 │
+└───────────┴────────────┴──────┴────────┴─────────────────────┘
+sqlite>
+sqlite> ROLLBACK;
+sqlite> select * from account_no
+   ...> ;
+Parse error: no such table: account_no
+sqlite> select * from account_changes;
+┌───────────┬────────────┬──────┬────────┬─────────────────────┐
+│ change_no │ account_no │ flag │ amount │     changed_at      │
+├───────────┼────────────┼──────┼────────┼─────────────────────┤
+│ 1         │ 200        │ +    │ 100    │ 2022-03-25 17:35:33 │
+└───────────┴────────────┴──────┴────────┴─────────────────────┘
+sqlite>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
